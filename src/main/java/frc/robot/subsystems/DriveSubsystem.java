@@ -19,6 +19,7 @@ import edu.wpi.first.util.WPIUtilJNI;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants.DriveConstants;
 import frc.utils.SwerveUtils;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class DriveSubsystem extends SubsystemBase {
@@ -123,10 +124,9 @@ public class DriveSubsystem extends SubsystemBase {
    *                      field.
    * @param rateLimit     Whether to enable rate limiting for smoother control.
    */
-  public void drive(double xSpeed, double ySpeed, double rot, boolean fieldRelative, boolean rateLimit) {
+  public void drive(double xSpeed, double ySpeed, double rot, boolean fieldRelative, boolean rateLimit, boolean rightButton3) {
     SmartDashboard.putNumber("xSpeed", xSpeed);
     SmartDashboard.putNumber("ySpeed", ySpeed);
-    SmartDashboard.putNumber("rot", rot);
     double xSpeedCommanded;
     double ySpeedCommanded;
 
@@ -167,15 +167,33 @@ public class DriveSubsystem extends SubsystemBase {
       }
       m_prevTime = currentTime;
       
-      xSpeedCommanded = m_currentTranslationMag * Math.cos(m_currentTranslationDir);
-      ySpeedCommanded = m_currentTranslationMag * Math.sin(m_currentTranslationDir);
-      m_currentRotation = m_rotLimiter.calculate(rot);
-
+      if(rightButton3 == true){
+        xSpeedCommanded = m_currentTranslationMag * Math.cos(m_currentTranslationDir);
+        ySpeedCommanded = m_currentTranslationMag * Math.sin(m_currentTranslationDir);
+        m_currentRotation = 0.0;
+        SmartDashboard.putNumber("rot", m_currentRotation);
+      } 
+      else {
+        xSpeedCommanded = m_currentTranslationMag * Math.cos(m_currentTranslationDir);
+        ySpeedCommanded = m_currentTranslationMag * Math.sin(m_currentTranslationDir);
+        m_currentRotation = m_rotLimiter.calculate(rot);
+        SmartDashboard.putNumber("rot", m_currentRotation);
+      }
 
     } else {
-      xSpeedCommanded = xSpeed;
-      ySpeedCommanded = ySpeed;
-      m_currentRotation = rot;
+
+      if(rightButton3 == true){
+        xSpeedCommanded = xSpeed;
+        ySpeedCommanded = ySpeed;
+        m_currentRotation = 0.0;
+        SmartDashboard.putNumber("rot", m_currentRotation);
+      } 
+      else {
+        xSpeedCommanded = xSpeed;
+        ySpeedCommanded = ySpeed;
+        m_currentRotation = rot;
+        SmartDashboard.putNumber("rot", m_currentRotation);
+      }
     }
 
     // Convert the commanded speeds into the correct units for the drivetrain
@@ -287,5 +305,36 @@ public class DriveSubsystem extends SubsystemBase {
     double distanceTraveled = wheelRotations * 2 * Math.PI * Units.inchesToMeters(3.0);
     return distanceTraveled;
   }
+
+public Command reverseTillFlatAgain(){
+  if(m_gyro.getPitch() > 0.5){
+    return run(
+      () ->
+    drive(0.0, -0.3, 0, true, true, false));
+  }
+  else if(m_gyro.getPitch() < 0.5){
+    return run(
+      () ->
+    drive(0.0, -0.3, 0, true, true, false));
+  }
+  else {
+    return runOnce(
+      () ->
+    drive(0.0, 0.0, 0.0, true, true, false));
+  }
+}
+
+public Command backToAngled(){
+  if(m_gyro.getPitch() > 0.5){
+    return run(
+      () ->
+    drive(0.0, 0.2, 0, true, true, false));
+  }
+  else {
+    return runOnce(
+      () ->
+    drive(0.0, 0.0, 0.0, true, true, false));
+  }
+}
 
 }

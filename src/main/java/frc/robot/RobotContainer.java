@@ -5,6 +5,7 @@
 package frc.robot;
 
 import frc.robot.Constants.*;
+import frc.robot.commands.AutoBalance;
 import frc.robot.commands.Autos;
 import frc.robot.commands.ExampleCommand;
 import frc.robot.subsystems.*;
@@ -12,6 +13,7 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -29,6 +31,7 @@ public class RobotContainer {
   private final ExampleSubsystem m_exampleSubsystem = new ExampleSubsystem();
   private final DriveSubsystem m_robotDrive = new DriveSubsystem();
   private final ArmSubsystem m_armSub = new ArmSubsystem();
+  private final IntakeSubsystem m_intakeSub = new IntakeSubsystem();
 
   // Replace with CommandPS4Controller or CommandJoystick if needed
   private final CommandJoystick m_strafeController =
@@ -41,13 +44,19 @@ public class RobotContainer {
       new GenericHID(OIConstants.kTurnControllerPort);
 
   private final JoystickButton m_rightTrigger =
-      new JoystickButton(m_strafeGenericHID, 1);
+      new JoystickButton(m_turnGenericHID, 1);
   private final JoystickButton m_leftTrigger =
       new JoystickButton(m_strafeGenericHID, 1);
   private final JoystickButton m_rightButton2 =
       new JoystickButton(m_turnGenericHID, 2);
   private final JoystickButton m_leftButton2 =
       new JoystickButton(m_strafeGenericHID, 2);
+  private final JoystickButton m_rightButton3 =
+      new JoystickButton(m_turnGenericHID, 3);
+  private final JoystickButton m_leftButton3 =
+      new JoystickButton(m_strafeGenericHID, 3);
+  private final JoystickButton m_leftButton6 =
+      new JoystickButton(m_strafeGenericHID, 6);
 
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
@@ -62,18 +71,22 @@ public class RobotContainer {
       // Turning is controlled by the X axis of the right stick.
       new RunCommand(
           () -> m_robotDrive.drive(
-              MathUtil.applyDeadband(m_strafeController.getY(), OIConstants.kJoystickDeadband),
-              MathUtil.applyDeadband(m_strafeController.getY(), OIConstants.kJoystickDeadband),
-               MathUtil.applyDeadband((m_turnController.getX() * Math.abs(m_turnController.getY() - 1.0)), OIConstants.kJoystickDeadband),
-              true, true),
+              MathUtil.applyDeadband(-m_strafeController.getX(), OIConstants.kJoystickDeadband),
+              MathUtil.applyDeadband(-m_strafeController.getY(), OIConstants.kJoystickDeadband),
+               MathUtil.applyDeadband(m_turnController.getX(), OIConstants.kJoystickDeadband),
+              true, true, m_rightButton3.getAsBoolean()),
           m_robotDrive));
 
     m_armSub.setDefaultCommand(
       new RunCommand(
           () -> m_armSub.moveArm(
-            (-m_turnController.getY() * Math.abs(m_turnController.getX() - 1.0))),
+            -m_turnController.getY(), m_rightButton3.getAsBoolean()),
           m_armSub));
-    
+    m_intakeSub.setDefaultCommand(
+      new RunCommand(
+          () -> m_intakeSub.runIntake(
+            m_rightTrigger.getAsBoolean(), m_leftTrigger.getAsBoolean(), m_rightButton2.getAsBoolean()),
+          m_intakeSub));
   }
 
   /**
@@ -93,6 +106,10 @@ public class RobotContainer {
     // Schedule `exampleMethodCommand` when the Xbox controller's B button is pressed,
     // cancelling on release.
      m_leftTrigger.whileTrue(m_exampleSubsystem.exampleMethodCommand());
+     m_leftButton3.whileTrue(new RunCommand(
+      () -> m_robotDrive.setX(),
+      m_robotDrive));
+    m_leftButton6.whileTrue(new AutoBalance(m_robotDrive));
   }
 
   /**
