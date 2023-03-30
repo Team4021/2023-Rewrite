@@ -12,6 +12,7 @@ import frc.robot.subsystems.*;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.RunCommand;
@@ -30,8 +31,8 @@ public class RobotContainer {
   // The robot's subsystems and commands are defined here...
   private final ExampleSubsystem m_exampleSubsystem = new ExampleSubsystem();
   private final DriveSubsystem m_robotDrive = new DriveSubsystem();
-  private final ArmSubsystem m_armSub = new ArmSubsystem();
-  private final IntakeSubsystem m_intakeSub = new IntakeSubsystem();
+  public final ArmSubsystem m_armSub = new ArmSubsystem();
+  public final IntakeSubsystem m_intakeSub = new IntakeSubsystem();
 
   // Replace with CommandPS4Controller or CommandJoystick if needed
   private final CommandJoystick m_strafeController =
@@ -57,7 +58,14 @@ public class RobotContainer {
       new JoystickButton(m_strafeGenericHID, 3);
   private final JoystickButton m_leftButton6 =
       new JoystickButton(m_strafeGenericHID, 6);
-
+  private final JoystickButton m_leftButton4 = 
+      new JoystickButton(m_strafeGenericHID, 4);
+  private final JoystickButton m_leftButton5 = 
+      new JoystickButton(m_strafeGenericHID, 5);
+  private final JoystickButton m_rightButton4 =
+      new JoystickButton(m_turnGenericHID, 4);
+  private final JoystickButton m_rightButton5 =
+      new JoystickButton(m_turnGenericHID, 5);
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
@@ -72,15 +80,14 @@ public class RobotContainer {
       new RunCommand(
           () -> m_robotDrive.drive(
               MathUtil.applyDeadband(-m_strafeController.getX(), OIConstants.kJoystickDeadband),
-              MathUtil.applyDeadband(-m_strafeController.getY(), OIConstants.kJoystickDeadband),
+              -MathUtil.applyDeadband(-m_strafeController.getY(), OIConstants.kJoystickDeadband),
                MathUtil.applyDeadband(m_turnController.getX(), OIConstants.kJoystickDeadband),
               true, true, m_rightButton3.getAsBoolean()),
           m_robotDrive));
 
     m_armSub.setDefaultCommand(
       new RunCommand(
-          () -> m_armSub.moveArm(
-            -m_turnController.getY(), m_rightButton3.getAsBoolean()),
+          () -> m_armSub.noMoveArm(),
           m_armSub));
     m_intakeSub.setDefaultCommand(
       new RunCommand(
@@ -110,6 +117,21 @@ public class RobotContainer {
       () -> m_robotDrive.setX(),
       m_robotDrive));
     m_leftButton6.whileTrue(new AutoBalance(m_robotDrive));
+    m_rightButton3.whileTrue(new RunCommand(
+      () -> m_armSub.moveArm(m_turnController.getY()),
+      m_armSub));
+    m_leftButton4.whileTrue(new RunCommand(
+      () -> m_armSub.setlevel(),
+      m_armSub));
+    m_rightButton4.whileTrue(new RunCommand(
+      () -> m_armSub.setIntake(),
+      m_armSub));
+    m_rightButton5.whileTrue(new RunCommand(
+      () -> m_armSub.setShoot(),
+      m_armSub));
+    m_leftButton5.whileTrue(new RunCommand(
+      () -> m_armSub.setMax(),
+      m_armSub));
   }
 
   /**
@@ -117,8 +139,20 @@ public class RobotContainer {
    *
    * @return the command to run in autonomous
    */
-  public Command getAutonomousCommand() {
+  public Command getAutonomousCommand(String m_chooser) {
     // An example command will be run in autonomous
-    return Autos.exampleAuto(m_exampleSubsystem);
+    // return Autos.exampleAuto(m_exampleSubsystem);
+    // switch(m_chooser){
+    //   case "autoBalance":
+    //     return Autos.balanceAuto(m_robotDrive, m_armSub, m_intakeSub);
+    //     break;
+    //   case "otherAutoBalance":
+    //     return Autos.otherBalanceAuto(m_robotDrive, m_armSub, m_intakeSub);
+    //     break;
+    //   case "otherAuto":
+    //     return Autos.exampleAuto(m_exampleSubsystem);
+    //     break;
+    // }
+    return null;
   }
 }

@@ -8,7 +8,7 @@ import frc.robot.subsystems.DriveSubsystem;
 
 public class AutoBalance extends CommandBase{
 
-    Pigeon2 pigeon = new Pigeon2(DriveConstants.kGyro);
+    Pigeon2 m_gyro = new Pigeon2(DriveConstants.kGyro);
 
     DriveSubsystem m_driveSubsystem;
 
@@ -25,9 +25,9 @@ public class AutoBalance extends CommandBase{
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    if(pigeon.getPitch() <= .5){
+    if(m_gyro.getPitch() <= .5){
         m_driveSubsystem.drive(0.0, -0.025, 0.0, true, true, false);
-    } else if(pigeon.getPitch() >= 1.5){
+    } else if(m_gyro.getPitch() >= 1.5){
         m_driveSubsystem.drive(0.0, 0.025, 0.0, true, true, false);
     } else{
         m_driveSubsystem.setX();
