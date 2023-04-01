@@ -59,9 +59,9 @@ public class SwerveModule {
     m_drivingMotor.config_kD(0, 2.56);
     m_drivingMotor.config_kF(0, 0.048);
 
-    m_turningMotor.config_kP(0, 18.0);
+    m_turningMotor.config_kP(0, 10.0);
     m_turningMotor.config_kI(0, 0);
-    m_turningMotor.config_kD(0, 180.0);
+    m_turningMotor.config_kD(0, 90.0);
     m_turningMotor.config_kF(0, 0);
 
     m_chassisAngularOffset = chassisAngularOffset;

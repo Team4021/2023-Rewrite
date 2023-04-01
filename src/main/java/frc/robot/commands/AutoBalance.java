@@ -25,10 +25,10 @@ public class AutoBalance extends CommandBase{
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    if(m_gyro.getPitch() <= .5){
-        m_driveSubsystem.drive(0.0, -0.025, 0.0, true, true, false);
-    } else if(m_gyro.getPitch() >= 1.5){
-        m_driveSubsystem.drive(0.0, 0.025, 0.0, true, true, false);
+    if(m_gyro.getPitch() <= 0){
+        m_driveSubsystem.drive(0.045, 0.0, 0.0, true, true, false);
+    } else if(m_gyro.getPitch() >= 2){
+        m_driveSubsystem.drive(-0.045, 0.0, 0.0, true, true, false);
     } else{
         m_driveSubsystem.setX();
     }

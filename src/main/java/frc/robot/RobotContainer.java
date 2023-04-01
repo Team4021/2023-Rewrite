@@ -58,14 +58,16 @@ public class RobotContainer {
       new JoystickButton(m_strafeGenericHID, 3);
   private final JoystickButton m_leftButton6 =
       new JoystickButton(m_strafeGenericHID, 6);
-  private final JoystickButton m_leftButton4 = 
-      new JoystickButton(m_strafeGenericHID, 4);
+  private final JoystickButton m_leftButton7 = 
+      new JoystickButton(m_strafeGenericHID, 7);
   private final JoystickButton m_leftButton5 = 
       new JoystickButton(m_strafeGenericHID, 5);
   private final JoystickButton m_rightButton4 =
       new JoystickButton(m_turnGenericHID, 4);
   private final JoystickButton m_rightButton5 =
       new JoystickButton(m_turnGenericHID, 5);
+  private final JoystickButton m_leftButton4 =
+      new JoystickButton(m_strafeGenericHID, 4);
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
@@ -79,20 +81,20 @@ public class RobotContainer {
       // Turning is controlled by the X axis of the right stick.
       new RunCommand(
           () -> m_robotDrive.drive(
-              MathUtil.applyDeadband(-m_strafeController.getX(), OIConstants.kJoystickDeadband),
               -MathUtil.applyDeadband(-m_strafeController.getY(), OIConstants.kJoystickDeadband),
-               MathUtil.applyDeadband(m_turnController.getX(), OIConstants.kJoystickDeadband),
+              -MathUtil.applyDeadband(-m_strafeController.getX(), OIConstants.kJoystickDeadband),
+               MathUtil.applyDeadband(-m_turnController.getX(), OIConstants.kJoystickDeadband),
               true, true, m_rightButton3.getAsBoolean()),
           m_robotDrive));
 
     m_armSub.setDefaultCommand(
       new RunCommand(
-          () -> m_armSub.noMoveArm(),
+          () -> m_armSub.noMoveArm(MathUtil.applyDeadband(m_strafeController.getX(), OIConstants.kJoystickDeadband),
+          MathUtil.applyDeadband(m_strafeController.getY(), OIConstants.kJoystickDeadband)),
           m_armSub));
     m_intakeSub.setDefaultCommand(
       new RunCommand(
-          () -> m_intakeSub.runIntake(
-            m_rightTrigger.getAsBoolean(), m_leftTrigger.getAsBoolean(), m_rightButton2.getAsBoolean()),
+          () -> m_intakeSub.noRunIntake(),
           m_intakeSub));
   }
 
@@ -112,7 +114,9 @@ public class RobotContainer {
 
     // Schedule `exampleMethodCommand` when the Xbox controller's B button is pressed,
     // cancelling on release.
-     m_leftTrigger.whileTrue(m_exampleSubsystem.exampleMethodCommand());
+     m_leftTrigger.whileTrue(new RunCommand(
+      () -> m_armSub.setIntake(), 
+      m_armSub));
      m_leftButton3.whileTrue(new RunCommand(
       () -> m_robotDrive.setX(),
       m_robotDrive));
@@ -120,39 +124,51 @@ public class RobotContainer {
     m_rightButton3.whileTrue(new RunCommand(
       () -> m_armSub.moveArm(m_turnController.getY()),
       m_armSub));
-    m_leftButton4.whileTrue(new RunCommand(
-      () -> m_armSub.setlevel(),
+    m_leftButton7.whileTrue(new RunCommand(
+      () -> m_armSub.setMax(),
       m_armSub));
     m_rightButton4.whileTrue(new RunCommand(
-      () -> m_armSub.setIntake(),
+      () -> m_armSub.setLow(),
       m_armSub));
     m_rightButton5.whileTrue(new RunCommand(
-      () -> m_armSub.setShoot(),
+      () -> m_armSub.setHigh(),
       m_armSub));
     m_leftButton5.whileTrue(new RunCommand(
       () -> m_armSub.setMax(),
       m_armSub));
+    m_rightButton2.whileTrue(new RunCommand(
+      () -> m_armSub.setMid(),
+      m_armSub));
+    m_rightTrigger.whileTrue(new RunCommand(
+      () -> m_intakeSub.runIntake(), 
+      m_intakeSub));
+    m_leftButton2.whileTrue(new RunCommand(
+      () -> m_intakeSub.slowOut(),
+      m_intakeSub));
+    m_leftButton4.whileTrue(new RunCommand(
+      () -> m_intakeSub.shoot(),
+      m_intakeSub));
   }
 
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.
-   *
-   * @return the command to run in autonomous
    */
   public Command getAutonomousCommand(String m_chooser) {
     // An example command will be run in autonomous
     // return Autos.exampleAuto(m_exampleSubsystem);
-    // switch(m_chooser){
-    //   case "autoBalance":
-    //     return Autos.balanceAuto(m_robotDrive, m_armSub, m_intakeSub);
-    //     break;
-    //   case "otherAutoBalance":
-    //     return Autos.otherBalanceAuto(m_robotDrive, m_armSub, m_intakeSub);
-    //     break;
-    //   case "otherAuto":
-    //     return Autos.exampleAuto(m_exampleSubsystem);
-    //     break;
-    // }
-    return null;
+    // if(m_chooser == "autoBalance"){
+      // return Autos.balanceAuto(m_robotDrive, m_armSub, m_intakeSub);
+    if(m_chooser == "otherAutoBalance"){
+      return Autos.otherBalanceAuto(m_robotDrive, m_armSub, m_intakeSub);
+    } else if(m_chooser == "otherAuto"){
+        return Autos.exampleAuto(m_robotDrive);
+    } else if(m_chooser == "Shoot"){
+        return Autos.shootAuto(m_robotDrive, m_armSub, m_intakeSub);
+    } else if(m_chooser == "CableSide"){
+      return Autos.longDriveAuto(m_robotDrive, m_armSub, m_intakeSub);
+    } else{
+      return Autos.exampleAuto(m_robotDrive);
+    }
+
   }
 }

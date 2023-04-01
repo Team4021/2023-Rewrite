@@ -4,28 +4,22 @@
 
 package frc.robot.commands;
 
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.subsystems.DriveSubsystem;
+import frc.robot.subsystems.ArmSubsystem;
 
-public class DriveForTime extends CommandBase {
-  
-  private final DriveSubsystem m_robotDrive;
-  private final double xSpeed;
-  private final double ySpeed;
+public class ArmForTime extends CommandBase {
+
+  private final ArmSubsystem m_armSub;
 
   private double target = 0.0;
   private double counter = 0.0;
-
-  /** Creates a new DriveForTime. */
-  public DriveForTime(DriveSubsystem m_robotDrive, double xSpeed, double ySpeed, double seconds) {
-    this.m_robotDrive = m_robotDrive;
-    this.xSpeed = xSpeed;
-    this.ySpeed = ySpeed;
+  /** Creates a new ArmForTime. */
+  public ArmForTime(ArmSubsystem m_armSub, double seconds) {
+    this.m_armSub = m_armSub;
 
     target = seconds * 50;
     // Use addRequirements() here to declare subsystem dependencies.
-    addRequirements(m_robotDrive);
+    addRequirements(m_armSub);
   }
 
   // Called when the command is initially scheduled.
@@ -39,19 +33,17 @@ public class DriveForTime extends CommandBase {
       counter++;
     }
 
-    m_robotDrive.drive(xSpeed, ySpeed, 0.0, true, true, false);
-    SmartDashboard.putNumber("counter", counter);
+    m_armSub.setHigh();
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    m_robotDrive.drive(0.0,0.0,0.0, true, true ,false);
+    m_armSub.noMoveArm(0,0);
   }
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return counter >= target;
-  }
+    return counter >= target;  }
 }

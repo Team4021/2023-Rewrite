@@ -6,15 +6,12 @@ import com.ctre.phoenix.motorcontrol.TalonFXControlMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import com.ctre.phoenix.sensors.SensorInitializationStrategy;
 
-import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class ArmSubsystem extends SubsystemBase{
     
     WPI_TalonFX m_armMotor = new WPI_TalonFX(11);
-    DigitalInput m_lowerSwitch = new DigitalInput(0);
-    DigitalInput m_upperSwitch = new DigitalInput(1);
     double armMotorDist;
     double armSpeed = 0;
 
@@ -32,8 +29,12 @@ public class ArmSubsystem extends SubsystemBase{
         m_armMotor.configPeakOutputReverse(-.25);
     }
 
-    public void noMoveArm(){
-        m_armMotor.set(0);
+    public void noMoveArm(double xSpeed, double ySpeed){
+        if(Math.abs(xSpeed) <= .65 && Math.abs(ySpeed) <= 0.65){
+            m_armMotor.set(0);
+        }else{
+            setTravel();
+        }
     }
     public void moveArm(double zSpeed){
 
@@ -65,17 +66,22 @@ public class ArmSubsystem extends SubsystemBase{
             }        
     }
     public void setIntake(){
-        m_armMotor.set(TalonFXControlMode.Position, -70000);
+        m_armMotor.set(TalonFXControlMode.Position, -60000);
     }
     public void setMax(){
-        m_armMotor.set(TalonFXControlMode.Position, -10000);
+        m_armMotor.set(TalonFXControlMode.Position, -5000);
     }
-    public void setShoot(){
+    public void setMid(){
+        m_armMotor.set(TalonFXControlMode.Position, -30000);
+    }
+    public void setHigh(){
+        m_armMotor.set(TalonFXControlMode.Position, -20000);
+    }
+    public void setTravel(){
+        m_armMotor.set(TalonFXControlMode.Position, -15000);
+    }
+    public void setLow(){
         m_armMotor.set(TalonFXControlMode.Position, -35000);
-    }
-    public void setlevel(){
-        m_armMotor.set(TalonFXControlMode.Position, -65000);
-
     }
 
 }

@@ -4,6 +4,8 @@
 
 package frc.robot;
 
+import edu.wpi.first.cameraserver.CameraServer;
+import edu.wpi.first.cscore.UsbCamera;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -22,6 +24,9 @@ public class Robot extends TimedRobot {
 
   private RobotContainer m_robotContainer;
 
+  UsbCamera cam0;
+
+
   public final SendableChooser<String> m_chooser = new SendableChooser<>();
   /**
    * This function is run when the robot is first started up and should be used for any
@@ -35,10 +40,14 @@ public class Robot extends TimedRobot {
     m_robotContainer.m_armSub.configArmMotor();
     m_robotContainer.m_intakeSub.configintakeMotor();
 
-    m_chooser.setDefaultOption("AutoBalance", null);
-    m_chooser.addOption("otherAutoBalance", null);
-    m_chooser.addOption("otherAuto", null);
+    // m_chooser.setDefaultOption("autoBalance", "autoBalance");
+    m_chooser.setDefaultOption("SubstationSide", "Shoot");
+    m_chooser.addOption("AutoBalance", "otherAutoBalance");
+    m_chooser.addOption("CableSide", "CableSide");
+    m_chooser.addOption("otherAuto", "otherAuto");
     SmartDashboard.putData("Auto choices", m_chooser);
+    cam0 = CameraServer.startAutomaticCapture(0);
+
   }
 
   /**
